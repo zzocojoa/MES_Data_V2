@@ -1,0 +1,69 @@
+# =========================
+# OS & Editor Files
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# =========================
+# Python (api_server, ext_pipeline)
+# =========================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+.env
+.venv
+
+# =========================
+# Node / Frontend (frontend)
+# =========================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Production build output
+dist/
+dist-ssr/
+build/
+out/
+
+# TypeScript
+*.tsbuildinfo
+
+# =========================
+# Project Specific (MES_Data_V2)
+# =========================
+# Edge Collector Data Folders (Do not push actual CSV data)
+ext_pipeline/data_in/
+ext_pipeline/data_processed/
+ext_pipeline/data_error/
+ext_pipeline/test_data/
+
+# Environment variables (SECURITY RISK if pushed)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+api_server/.env
+ext_pipeline/.env
+
+# Temporary or Log files
+*.log
+logs/
+.system_generated/
