@@ -61,3 +61,15 @@
 - **실행 방법:** `ext_pipeline/run_watcher.bat` 더블 클릭
 - **사용법:** 위 스크립트를 켜둔 상태로, `ext_pipeline/data_in` 폴더에 CSV
   파일(PLC, 온도, 일지 등)을 넣으면 즉시 파싱되어 NAS DB로 전송됩니다.
+
+---
+
+## 🚀 깃허브에서 NAS로 최신 코드로 업데이트하는 방법
+
+# 1. 깃허브에 올라온 최신 코드를 NAS로 끌어오기
+
+git pull origin main
+
+# 2. 바뀐 코드를 바탕으로 도커 상자를 다시 만들어서 재가동하기
+
+sudo docker-compose up -d --build
