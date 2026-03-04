@@ -4,21 +4,18 @@ export default {
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        dark: {
-          bg: '#0F172A',
-          card: '#1E293B',
-          border: '#334155',
-          text: '#F8FAFC',
-          muted: '#94A3B8'
-        },
-        primary: {
-          DEFAULT: '#3B82F6',
-          hover: '#2563EB'
-        }
-      }
+        "primary": "#0d5e57",
+        "accent": "#329F5B",
+        "background-light": "#f6f8f8",
+        "background-dark": "#11211f",
+      },
+      fontFamily: {
+        "display": ["Inter", "sans-serif"]
+      },
     },
   },
   plugins: [],

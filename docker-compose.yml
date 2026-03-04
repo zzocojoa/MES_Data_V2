@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: mes_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - mes_db_data:/var/lib/postgresql/data
+
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: mes_api
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-postgres}
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount pipeline data folders so files can be uploaded/downloaded locally on the NAS
+      - ./ext_pipeline/data_in:/app/ext_pipeline/data_in
+      - ./ext_pipeline/data_processed:/app/ext_pipeline/data_processed
+      - ./ext_pipeline/data_error:/app/ext_pipeline/data_error
+    depends_on:
+      - db
+
+  watcher:
+    build: 
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: mes_watcher
+    restart: always
+    environment:
+      - PG_HOST=db
+      - PG_PORT=5432
+      - PG_DB=${DB_NAME:-postgres}
+      - PG_USER=${DB_USER:-postgres}
+      - PG_PASS=${DB_PASSWORD:-postgres}
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-postgres}
+    # Override default uvicorn cmd to run watcher
+    command: ["python", "/app/ext_pipeline/watcher.py"]
+    volumes:
+      # Shares the same folders as the API for consistency
+      - ./ext_pipeline/data_in:/app/ext_pipeline/data_in
+      - ./ext_pipeline/data_processed:/app/ext_pipeline/data_processed
+      - ./ext_pipeline/data_error:/app/ext_pipeline/data_error
+    depends_on:
+      - db
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: mes_web
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+volumes:
+  mes_db_data:

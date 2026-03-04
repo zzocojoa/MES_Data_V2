@@ -1,0 +1,92 @@
+{
+  "header": {
+    "title": "PLC Data Upload"
+  },
+  "dashboard": {
+    "title": "Data Management Console",
+    "subtitle": "Industrial automation log synchronization to PostgreSQL database"
+  },
+  "stats": {
+    "totalRecords": "Total Records",
+    "lastSync": "Last Sync",
+    "todaysFiles": "Today's Files",
+    "storage": "Storage",
+    "noSync": "No data yet"
+  },
+  "upload": {
+    "stage1": {
+      "title": "Stage 1: Local Select",
+      "subtitle": "Choose files or folder from your computer to begin processing.",
+      "btnFiles": "Select Files",
+      "btnFolder": "Select Folder",
+      "statusReady": "{{count}} files selected in stage 1. Click Search Preview.",
+      "statusEmpty": "Awaiting local file selection in stage 1."
+    },
+    "stage2": {
+      "title": "Stage 2: Validation & Review",
+      "subtitle": "Preview the files and filter out any duplicates before uploading.",
+      "filterDuplicates": "Redundancy checks",
+      "btnSearch": "Search Preview",
+      "btnSearching": "Searching...",
+      "btnStart": "Start Upload",
+      "btnTotalRecords": "Total {{count}} records",
+      "btnResume": "Resume",
+      "btnPause": "Pause",
+      "filesPrepared": "{{count}} files prepared",
+      "duplicatesSkipped": "{{count}} duplicate(s) skipped",
+      "allDuplicates": "All files are duplicates",
+      "totalSize": "Total Size",
+      "clickPreview": "Click Search Preview...",
+      "moreduplicates": "{{count}} more duplicate(s)"
+    },
+    "result": {
+      "title": "Upload Complete",
+      "success": "{{count}} succeeded",
+      "failed": "{{count}} failed",
+      "total": "{{count}} total",
+      "dismiss": "Dismiss"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "clearAll": "Clear All",
+    "empty": "No notifications yet"
+  },
+  "history": {
+    "title": "Upload History",
+    "searchPlaceholder": "Search files...",
+    "itemsPerPage": "{{count}} items",
+    "columns": {
+      "filename": "Filename/ID",
+      "deviceId": "Device ID",
+      "timestamp": "Timestamp",
+      "status": "Status",
+      "targetDb": "Target DB",
+      "actions": "Actions"
+    },
+    "statusSuccess": "SUCCESS",
+    "statusProcessing": "Processing...",
+    "statusJustNow": "Just now",
+    "targetSpot": "spot_temperature_sensor",
+    "targetPlc": "System PLC",
+    "actionViewLog": "View Log",
+    "actionDelete": "Delete",
+    "emptyState": "No files processed yet.",
+    "footerStatus": "Showing {{start}} to {{end}} of {{total}} recent uploads"
+  },
+  "modals": {
+    "log": {
+      "title": "Execution Log",
+      "loading": "Loading log details...",
+      "btnClose": "Close"
+    },
+    "delete": {
+      "title": "Confirm Deletion",
+      "message": "Are you sure you want to delete",
+      "subMessage": "This action will permanently remove the physical artifact and logically wipe the associated metrics from the database.",
+      "btnCancel": "Cancel",
+      "btnDelete": "Delete Data",
+      "btnDeleting": "Deleting..."
+    }
+  }
+}

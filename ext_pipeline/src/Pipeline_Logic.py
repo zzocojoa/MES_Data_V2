@@ -2,6 +2,12 @@ import os
 import pandas as pd
 from io import StringIO
 from src.db import DatabaseManager
+from src.Pipeline_Structure import (
+    PLC_COLUMN_MAPPING_STRUCTURE,
+    PLC_EXPECTED_COLS_STRUCTURE,
+    SPOT_COLUMN_MAPPING_STRUCTURE,
+    SPOT_AVAILABLE_COLS_STRUCTURE
+)
 
 class CsvProcessor:
     def __init__(self):
@@ -34,32 +40,7 @@ class CsvProcessor:
             return
 
         # 1. Map Columns based on schema
-        # (Assuming standard column names exist, adjust based on actual CSV contents)
-        col_mapping = {
-            "Time": "timestamp",
-            "시간": "timestamp",
-            "시각": "timestamp",
-            
-            "메인압력": "main_pressure",
-            "메인 압력": "main_pressure",
-            
-            "빌렛길이": "billet_length",
-            "빌렛 길이": "billet_length",
-            
-            "콘테이너온도 앞쪽": "container_temp_front",
-            "콘테이너온도 뒤쪽": "container_temp_rear",
-            
-            "생산카운터": "production_counter",
-            "생산카운트": "production_counter",
-            
-            "현재속도": "current_speed",
-            "현재 속도": "current_speed",
-            
-            "압출종료위치": "extrusion_end_position",
-            "압출종료 위치": "extrusion_end_position"
-        }
-        
-        df.rename(columns=col_mapping, inplace=True)
+        df.rename(columns=PLC_COLUMN_MAPPING_STRUCTURE, inplace=True)
         
         # 2. Add standard fields if not exists
         if "timestamp" in df.columns:
@@ -70,17 +51,13 @@ class CsvProcessor:
 
         # Prepare for DB
         existing_cols = []
-        expected_cols = [
-            "timestamp", "main_pressure", "billet_length", 
-            "container_temp_front", "container_temp_rear", 
-            "production_counter", "current_speed", "extrusion_end_position"
-        ]
         
-        for col in expected_cols:
+        for col in PLC_EXPECTED_COLS_STRUCTURE:
             if col in df.columns:
                 existing_cols.append(col)
                 
         df_to_insert = df[existing_cols].copy()
+        df_to_insert["source_file"] = os.path.basename(csv_path)
         
         # 3. Bulk Insert (Ultra-fast COPY method via StringIO)
         self._bulk_insert_df("tb_metrics", df_to_insert)
@@ -97,14 +74,7 @@ class CsvProcessor:
         if df.empty: return
 
         # Spot typical mapping
-        col_mapping = {
-            "Time": "timestamp",
-            "Date": "timestamp",
-            "Temperature": "temperature",
-            "온도": "temperature",
-            "temp": "temperature"
-        }
-        df.rename(columns=col_mapping, inplace=True)
+        df.rename(columns=SPOT_COLUMN_MAPPING_STRUCTURE, inplace=True)
         
         if "timestamp" in df.columns:
             df["timestamp"] = self._convert_to_kst(df["timestamp"])
@@ -113,10 +83,11 @@ class CsvProcessor:
         
         # Select what exists
         available_cols = []
-        for c in ["timestamp", "temperature", "device_id"]:
+        for c in SPOT_AVAILABLE_COLS_STRUCTURE:
             if c in df.columns: available_cols.append(c)
             
         df_to_insert = df[available_cols].copy()
+        df_to_insert["source_file"] = os.path.basename(csv_path)
         self._bulk_insert_df("tb_metrics", df_to_insert)
 
     def _bulk_insert_df(self, table_name, df):
@@ -125,9 +96,18 @@ class CsvProcessor:
             print(f"Skipping insert for {table_name}, DataFrame consists of no records")
             return
             
-        # Clean null values
-        df.fillna('', inplace=True)
-
+        # Coerce non-numeric values (empty strings, garbage) to NaN for numeric columns
+        # Then convert integer-like columns to nullable Int64 so to_csv writes '3' not '3.0'
+        INT_COLUMNS = {'production_counter', 'billet_length', 'mold_1', 'mold_2', 'mold_3', 
+                       'mold_4', 'mold_5', 'mold_6', 'billet_temp', 'at_pre'}
+        for col in df.columns:
+            if col not in ['source_file', 'device_id', 'timestamp']:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+                if col in INT_COLUMNS:
+                    df[col] = df[col].astype('Int64')
+        
+        # pandas to_csv writes NaN/NA as empty string by default
+        # psycopg2 copy_from with null='' treats empty strings as SQL NULL
         buffer = StringIO()
         df.to_csv(buffer, index=False, header=False, sep='\t')
         buffer.seek(0)
@@ -137,7 +117,6 @@ class CsvProcessor:
         conn = self.db.get_connection()
         try:
             with conn.cursor() as cur:
-                # Direct load from string memory buffer
                 cur.copy_from(buffer, table_name, sep='\t', columns=columns, null='')
             conn.commit()
             print(f"Successfully inserted {len(df)} records into {table_name}.")

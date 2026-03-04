@@ -32,6 +32,7 @@ class Metrics_Structure(Base):
     die_id = Column(String(50))
     billet_cycle_id = Column(String(100))
     device_id = Column(String(50))
+    source_file = Column(String(255))
 
 class WorkLog_Structure(Base):
     __tablename__ = "tb_work_log"
@@ -43,6 +44,7 @@ class WorkLog_Structure(Base):
     die_number = Column(String(50))
     lot = Column(String(100))
     temper_type = Column(String(50))
+    source_file = Column(String(255))
     op_note = Column(Text)
     production_qty = Column(Float)
     production_weight = Column(Float)

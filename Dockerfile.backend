@@ -1,0 +1,28 @@
+# Use official Python lightweight image
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies (for psycopg2 compilation if needed)
+RUN apt-get update && apt-get install -y \
+    libpq-dev gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements from both api_server and ext_pipeline
+COPY api_server/requirements.txt /app/api_requirements.txt
+COPY ext_pipeline/requirements.txt /app/pipeline_requirements.txt
+
+# Merge and install requirements
+RUN cat /app/api_requirements.txt /app/pipeline_requirements.txt | sort -u > /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt fastapi uvicorn pandas python-multipart
+
+# Copy the entire project code into the container
+COPY api_server /app/api_server
+COPY ext_pipeline /app/ext_pipeline
+
+# Create necessary directories for pipeline if they don't exist
+RUN mkdir -p /app/ext_pipeline/data_in /app/ext_pipeline/data_processed /app/ext_pipeline/data_error /app/ext_pipeline/test_data
+
+# The default command will be overridden by docker-compose for api vs watcher
+CMD ["uvicorn", "api_server.main:app", "--host", "0.0.0.0", "--port", "8000"]

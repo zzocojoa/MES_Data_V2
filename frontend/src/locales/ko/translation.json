@@ -1,0 +1,92 @@
+{
+  "header": {
+    "title": "PLC Data Upload"
+  },
+  "dashboard": {
+    "title": "데이터 관리 콘솔",
+    "subtitle": "산업용 자동화 로그를 PostgreSQL 데이터베이스에 동기화합니다"
+  },
+  "stats": {
+    "totalRecords": "총 레코드",
+    "lastSync": "마지막 동기화",
+    "todaysFiles": "오늘 처리된 파일",
+    "storage": "스토리지",
+    "noSync": "데이터 없음"
+  },
+  "upload": {
+    "stage1": {
+      "title": "1단계: 로컬 선택",
+      "subtitle": "처리를 시작하려면 컴퓨터에서 파일 또는 폴더를 선택하세요.",
+      "btnFiles": "파일 선택",
+      "btnFolder": "폴더 선택",
+      "statusReady": "1단계에서 {{count}}개의 파일이 선택되었습니다. 검색 미리보기를 클릭하세요.",
+      "statusEmpty": "1단계 로컬 파일 선택을 대기 중입니다."
+    },
+    "stage2": {
+      "title": "2단계: 검증 및 검토",
+      "subtitle": "업로드하기 전에 파일을 미리보고 중복 항목을 필터링하세요.",
+      "filterDuplicates": "중복성 검사",
+      "btnSearch": "검색 미리보기",
+      "btnSearching": "검색 중...",
+      "btnStart": "업로드 시작",
+      "btnTotalRecords": "총 {{count}}개 레코드",
+      "btnResume": "이어서 시작",
+      "btnPause": "일시정지",
+      "filesPrepared": "{{count}}개 파일 준비 완료",
+      "duplicatesSkipped": "{{count}}개 중복 파일 제외됨",
+      "allDuplicates": "모든 파일이 중복입니다",
+      "totalSize": "총 크기",
+      "clickPreview": "검색 미리보기를 클릭하세요...",
+      "moreduplicates": "{{count}}개 추가 중복 파일"
+    },
+    "result": {
+      "title": "업로드 완료",
+      "success": "{{count}}개 성공",
+      "failed": "{{count}}개 실패",
+      "total": "총 {{count}}개",
+      "dismiss": "확인"
+    }
+  },
+  "notifications": {
+    "title": "알림",
+    "clearAll": "모두 지우기",
+    "empty": "알림이 없습니다"
+  },
+  "history": {
+    "title": "업로드 내역",
+    "searchPlaceholder": "파일 찾기...",
+    "itemsPerPage": "{{count}}개 항목",
+    "columns": {
+      "filename": "파일이름/ID",
+      "deviceId": "디바이스 ID",
+      "timestamp": "타임스탬프",
+      "status": "상태",
+      "targetDb": "대상 DB",
+      "actions": "작업"
+    },
+    "statusSuccess": "성공",
+    "statusProcessing": "처리 중...",
+    "statusJustNow": "방금",
+    "targetSpot": "spot 열화상 센서",
+    "targetPlc": "시스템 PLC",
+    "actionViewLog": "로그 보기",
+    "actionDelete": "삭제",
+    "emptyState": "아직 처리된 파일이 없습니다.",
+    "footerStatus": "최근 업로드 {{total}}개 중 {{start}} 에서 {{end}} 항목 표시"
+  },
+  "modals": {
+    "log": {
+      "title": "실행 로그",
+      "loading": "로그 상세 내용을 불러오는 중...",
+      "btnClose": "닫기"
+    },
+    "delete": {
+      "title": "삭제 확인",
+      "message": "정말 삭제하시겠습니까?",
+      "subMessage": "이 작업은 물리적 파일을 영구적으로 삭제하고 데이터베이스에서 연결된 메트릭을 논리적으로 완전히 제거합니다.",
+      "btnCancel": "취소",
+      "btnDelete": "데이터 삭제",
+      "btnDeleting": "삭제 중..."
+    }
+  }
+}

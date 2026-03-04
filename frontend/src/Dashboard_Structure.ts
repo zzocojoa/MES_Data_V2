@@ -12,6 +12,8 @@ export interface MetricsData {
   temperature?: number;
   mold_1?: number;
   device_id?: string;
+  die_id?: string;
+  displayTime?: string;
 }
 
 export interface WorkLogData {
@@ -26,3 +28,18 @@ export interface WorkLogData {
   defect_tearing: number;
   defect_etc: number;
 }
+
+export interface DBStatsData {
+  total_records: number;
+  last_sync: string | null;
+  todays_files: number;
+  storage_size: string;
+}
+
+export interface UploadedFileMeta {
+  filename: string;
+  target_db: string;
+  timestamp: string;
+  size: number;
+}
+
