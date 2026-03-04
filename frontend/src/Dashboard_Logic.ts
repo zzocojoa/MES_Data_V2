@@ -2,7 +2,7 @@
 import axios from 'axios';
 import type { MetricsData, WorkLogData, UploadedFileMeta } from './Dashboard_Structure';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = '/api';
 
 export const fetchMetricsData = async (): Promise<MetricsData[]> => {
   try {
