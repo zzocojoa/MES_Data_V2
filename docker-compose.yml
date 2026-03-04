@@ -22,7 +22,11 @@ services:
     restart: always
     environment:
       - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-postgres}
+      - DB_HOST=db
       - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-postgres}
     working_dir: /app/api_server
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
@@ -42,13 +46,12 @@ services:
     container_name: mes_watcher
     restart: always
     environment:
-      - PG_HOST=db
-      - PG_PORT=5432
-      - DB_PORT=5432
-      - PG_DB=${DB_NAME:-postgres}
-      - PG_USER=${DB_USER:-postgres}
-      - PG_PASS=${DB_PASSWORD:-postgres}
       - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-postgres}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-postgres}
     # Override default working dir and cmd to run watcher
     working_dir: /app/ext_pipeline
     command: ["python", "watcher.py"]
