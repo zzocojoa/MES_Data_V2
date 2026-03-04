@@ -73,3 +73,15 @@ git pull origin main
 # 2. 바뀐 코드를 바탕으로 도커 상자를 다시 만들어서 재가동하기
 
 sudo docker-compose up -d --build
+
+# 1. 서버 완전 종료 (가장 추천)
+
+sudo docker-compose down
+
+# 2. 서버 재시작 (간단 리부팅)
+
+sudo docker-compose restart
+
+# 33. 서버 다시 켜기 (종료 후 실행)
+
+sudo docker-compose up -d
