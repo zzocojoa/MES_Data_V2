@@ -68,6 +68,10 @@ def get_db_stats(db: Session):
 
 import os
 import subprocess
+from filelock import FileLock # fallback if available, or just use thread lock
+import threading
+
+pipeline_lock = threading.Lock()
 from datetime import datetime, timezone
 from fastapi import HTTPException, UploadFile, BackgroundTasks
 
@@ -161,16 +165,19 @@ def run_pipeline_for_file(file_path: str):
         pipeline_python = "python"  # Fallback to system Python
         
     try:
-        result = subprocess.run(
-            [pipeline_python, main_script, file_path],
-            cwd=pipeline_dir,
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        print(f"Pipeline OK: {result.stdout}")
+        with pipeline_lock:
+            result = subprocess.run(
+                [pipeline_python, main_script, file_path],
+                cwd=pipeline_dir,
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            print(f"Pipeline OK: {result.stdout}")
     except subprocess.CalledProcessError as e:
-        print(f"Pipeline Error for {file_path}: {e.stderr}")
+        print(f"Pipeline Error for {file_path} (Exit: {e.returncode}):")
+        if e.stderr: print(f"STDERR: {e.stderr}")
+        if e.stdout: print(f"STDOUT: {e.stdout}")
 
 def process_file_upload(file: UploadFile, background_tasks: BackgroundTasks = None):
     os.makedirs(WATCH_DIR, exist_ok=True)

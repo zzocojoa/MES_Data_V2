@@ -29,9 +29,11 @@ class CsvProcessor:
         """
         print(f"Processing PLC CSV: {csv_path}")
         
+        # Determine encoding safely by streaming the file in pure python (Zero memory footprint)
+        encoding = "utf-8"
         try:
-            pd.read_csv(csv_path, encoding="utf-8", nrows=1)
-            encoding = "utf-8"
+            with open(csv_path, "r", encoding="utf-8") as f:
+                for _ in f: pass
         except UnicodeDecodeError:
             encoding = "cp949"
             
@@ -69,9 +71,10 @@ class CsvProcessor:
         """Parses SPOT temperature CSV and bulk inserts into tb_metrics."""
         print(f"Processing SPOT Check CSV: {csv_path}")
         
+        encoding = "utf-8"
         try:
-            pd.read_csv(csv_path, encoding="utf-8", nrows=1)
-            encoding = "utf-8"
+            with open(csv_path, "r", encoding="utf-8") as f:
+                for _ in f: pass
         except UnicodeDecodeError:
             encoding = "cp949"
             
