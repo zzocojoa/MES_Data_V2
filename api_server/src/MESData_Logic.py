@@ -68,7 +68,6 @@ def get_db_stats(db: Session):
 
 import os
 import subprocess
-from filelock import FileLock # fallback if available, or just use thread lock
 import threading
 
 pipeline_lock = threading.Lock()
