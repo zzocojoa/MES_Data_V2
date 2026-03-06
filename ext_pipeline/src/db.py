@@ -7,7 +7,7 @@ load_dotenv()
 class DatabaseManager:
     def __init__(self):
         self.host = os.getenv("DB_HOST", "192.168.0.235")
-        self.port = os.getenv("DB_PORT", "5433")
+        self.port = os.getenv("DB_PORT", "15432")
         self.user = os.getenv("DB_USER", "postgres")
         self.password = os.getenv("DB_PASSWORD", "aldmc6061")
         self.dbname = os.getenv("DB_NAME", "postgres")
