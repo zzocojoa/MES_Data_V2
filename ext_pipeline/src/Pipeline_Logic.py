@@ -30,65 +30,66 @@ class CsvProcessor:
         print(f"Processing PLC CSV: {csv_path}")
         
         try:
-            # Read CSV
-            df = pd.read_csv(csv_path, encoding="utf-8")
+            # Read CSV in chunks to prevent memory spikes on 2GB NAS
+            chunk_iter = pd.read_csv(csv_path, encoding="utf-8", chunksize=10000)
         except UnicodeDecodeError:
-            df = pd.read_csv(csv_path, encoding="cp949")
+            chunk_iter = pd.read_csv(csv_path, encoding="cp949", chunksize=10000)
             
-        if df.empty:
-            print("CSV is empty.")
-            return
+        for df in chunk_iter:
+            if df.empty:
+                continue
 
-        # 1. Map Columns based on schema
-        df.rename(columns=PLC_COLUMN_MAPPING_STRUCTURE, inplace=True)
-        
-        # 2. Add standard fields if not exists
-        if "timestamp" in df.columns:
-            df["timestamp"] = self._convert_to_kst(df["timestamp"])
-        else:
-            print("Warning: No timestamp column found. Skipping file.")
-            return
+            # 1. Map Columns based on schema
+            df.rename(columns=PLC_COLUMN_MAPPING_STRUCTURE, inplace=True)
+            
+            # 2. Add standard fields if not exists
+            if "timestamp" in df.columns:
+                df["timestamp"] = self._convert_to_kst(df["timestamp"])
+            else:
+                print("Warning: No timestamp column found in chunk. Skipping chunk.")
+                continue
 
-        # Prepare for DB
-        existing_cols = []
-        
-        for col in PLC_EXPECTED_COLS_STRUCTURE:
-            if col in df.columns:
-                existing_cols.append(col)
-                
-        df_to_insert = df[existing_cols].copy()
-        df_to_insert["source_file"] = os.path.basename(csv_path)
-        
-        # 3. Bulk Insert (Ultra-fast COPY method via StringIO)
-        self._bulk_insert_df("tb_metrics", df_to_insert)
+            # Prepare for DB
+            existing_cols = []
+            
+            for col in PLC_EXPECTED_COLS_STRUCTURE:
+                if col in df.columns:
+                    existing_cols.append(col)
+                    
+            df_to_insert = df[existing_cols].copy()
+            df_to_insert["source_file"] = os.path.basename(csv_path)
+            
+            # 3. Bulk Insert (Ultra-fast COPY method via StringIO)
+            self._bulk_insert_df("tb_metrics", df_to_insert)
 
     def process_spot_data(self, csv_path):
         """Parses SPOT temperature CSV and bulk inserts into tb_metrics."""
         print(f"Processing SPOT Check CSV: {csv_path}")
         
         try:
-            df = pd.read_csv(csv_path, encoding="utf-8")
+            chunk_iter = pd.read_csv(csv_path, encoding="utf-8", chunksize=10000)
         except UnicodeDecodeError:
-            df = pd.read_csv(csv_path, encoding="cp949")
+            chunk_iter = pd.read_csv(csv_path, encoding="cp949", chunksize=10000)
 
-        if df.empty: return
+        for df in chunk_iter:
+            if df.empty: continue
 
-        # Spot typical mapping
-        df.rename(columns=SPOT_COLUMN_MAPPING_STRUCTURE, inplace=True)
-        
-        if "timestamp" in df.columns:
-            df["timestamp"] = self._convert_to_kst(df["timestamp"])
+            # Spot typical mapping
+            df.rename(columns=SPOT_COLUMN_MAPPING_STRUCTURE, inplace=True)
             
-        df["device_id"] = "spot_temperature_sensor"
-        
-        # Select what exists
-        available_cols = []
-        for c in SPOT_AVAILABLE_COLS_STRUCTURE:
-            if c in df.columns: available_cols.append(c)
+            if "timestamp" in df.columns:
+                df["timestamp"] = self._convert_to_kst(df["timestamp"])
+                
+            df["device_id"] = "spot_temperature_sensor"
             
-        df_to_insert = df[available_cols].copy()
-        df_to_insert["source_file"] = os.path.basename(csv_path)
-        self._bulk_insert_df("tb_metrics", df_to_insert)
+            # Select what exists
+            available_cols = []
+            for c in SPOT_AVAILABLE_COLS_STRUCTURE:
+                if c in df.columns: available_cols.append(c)
+                
+            df_to_insert = df[available_cols].copy()
+            df_to_insert["source_file"] = os.path.basename(csv_path)
+            self._bulk_insert_df("tb_metrics", df_to_insert)
 
     def _bulk_insert_df(self, table_name, df):
         """Uses psycopg2 COPY_FROM method to insert thousands of rows instantly."""

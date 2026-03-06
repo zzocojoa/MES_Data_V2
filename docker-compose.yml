@@ -9,10 +9,16 @@ services:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-postgres}
+    command: ["postgres", "-c", "max_connections=50", "-c", "shared_buffers=64MB"]
     ports:
       - "15432:5432"
     volumes:
       - mes_db_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 300M
 
   api:
     build: 
@@ -38,6 +44,11 @@ services:
       - ./ext_pipeline/data_error:/app/ext_pipeline/data_error
     depends_on:
       - db
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
 
   watcher:
     build: 
@@ -62,6 +73,11 @@ services:
       - ./ext_pipeline/data_error:/app/ext_pipeline/data_error
     depends_on:
       - db
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 350M
 
   web:
     build:
@@ -73,6 +89,11 @@ services:
       - "8080:80"
     depends_on:
       - api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
 
 volumes:
   mes_db_data:
