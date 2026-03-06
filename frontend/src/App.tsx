@@ -37,6 +37,7 @@ function App() {
   const [duplicateCount, setDuplicateCount] = useState(0);
   const [duplicateFileNames, setDuplicateFileNames] = useState<string[]>([]);
   const [pendingFiles, setPendingFiles] = useState<string[]>([]);
+  const [isFailedModalOpen, setIsFailedModalOpen] = useState<boolean>(false);
 
   // Upload Result State
   const [uploadResult, setUploadResult] = useState<{success: number; failed: number; total: number; failedNames: string[]} | null>(null);
@@ -370,7 +371,7 @@ function App() {
             )}
           </div>
           <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-slate-300">
-            <img className="w-full h-full object-cover" data-alt="User profile avatar operator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxmvg6qNudBGdurupx40IQrTk3CgJktYcjmiOIVSrbMQFHjt2w4jdwmiDGNN2eSegtzJClwNSLy2b6F-eeomTTit6Gu3lu0_eDu8aljryAyDtrODu8tYEDYJ0_YsjdnRO4lMu-YDuGO8IlEYPdAtnaOs0oeXIgFle3FOwgzNPafYX6J5z5puFbT_49QRf7pwuEJ1WD5eAcSlu4pDJyJ3sG5DgdghSf10KC-8CJmXR6bco-TyUNHivWZ3eXTwqccwmvmhNK_ChPIiA" alt="Profile" />
+            <img className="w-full h-full object-cover" data-alt="User profile avatar operator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxmvg6qNudBGdurupx40IQrTk3CgJktYcjmiOIVSrbMQFHjt2w4jdwmiDGNN2eSegtzJClwNSLy2b6F-eeomTTit6Gu3lu0_eDu8aljryAyDtrODu8tYEDYJ0_YsjdnRO4lMu-YDuGO8IlEYPdAtnaOs0oeXIgFle3FOwgzNPafYX6J5z5puFbT_49QRf7pwuEJ1WD5eAcSlu4pDJyJ3sG5DgdghSf10KC-8CJmXR6bco-TyUNHivWZ3eXTwqccwmvmhNK_ChPIyA" alt="Profile" />
           </div>
         </div>
       </header>
@@ -522,12 +523,21 @@ function App() {
                       </div>
                       {uploadResult.failed > 0 && uploadResult.failedNames.length > 0 && (
                         <div className="text-xs text-red-400 font-mono space-y-0.5 mt-1">
-                          {uploadResult.failedNames.map((name, i) => (
+                          {uploadResult.failedNames.slice(0, 5).map((name, i) => (
                             <p key={i} className="flex items-center gap-1">
                               <span className="material-symbols-outlined text-xs">error</span>
                               {name}
                             </p>
                           ))}
+                          {uploadResult.failedNames.length > 5 && (
+                            <button 
+                              onClick={() => setIsFailedModalOpen(true)}
+                              className="text-xs text-primary hover:text-accent font-semibold flex items-center gap-1 mt-1 transition-colors text-left"
+                            >
+                              <span className="material-symbols-outlined text-sm">open_in_new</span>
+                              ... and {uploadResult.failedNames.length - 5} more files (View All)
+                            </button>
+                          )}
                         </div>
                       )}
                       <button
@@ -1066,6 +1076,47 @@ function App() {
               >
                 {isDeleting && <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>}
                 {filesToDelete.length > 1 ? `Delete ${filesToDelete.length}` : t('common.delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Failed Files Modal */}
+      {isFailedModalOpen && uploadResult && uploadResult.failedNames.length > 0 && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 shrink-0">
+              <div className="flex items-center gap-3 text-slate-900 dark:text-white">
+                <span className="material-symbols-outlined text-amber-500 text-2xl">warning</span>
+                <h3 className="text-lg font-bold">Failed Uploads</h3>
+              </div>
+              <button 
+                onClick={() => setIsFailedModalOpen(false)}
+                className="size-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 bg-slate-50/50 dark:bg-slate-900/50 custom-scrollbar">
+              <div className="flex flex-col gap-1 px-4 py-2">
+                {uploadResult.failedNames.map((file, i) => (
+                  <div key={i} className="flex items-center justify-between py-2 px-3 hover:bg-white dark:hover:bg-slate-800 rounded-lg group transition-colors">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <span className="material-symbols-outlined text-slate-400 text-sm shrink-0">description</span>
+                      <p className="text-sm font-mono text-slate-700 dark:text-slate-300 truncate">{file}</p>
+                    </div>
+                    <span className="text-xs font-semibold text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded">Failed</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 flex justify-end">
+              <button 
+                onClick={() => setIsFailedModalOpen(false)}
+                className="px-6 py-2 bg-primary text-white rounded-lg font-semibold shadow-sm hover:bg-primary/90 transition-colors"
+              >
+                Close
               </button>
             </div>
           </div>
