@@ -40,7 +40,7 @@
       "moreduplicates": "{{count}} more duplicate(s)"
     },
     "result": {
-      "title": "Upload Complete",
+      "title": "Transfer Complete",
       "success": "{{count}} succeeded",
       "failed": "{{count}} failed",
       "total": "{{count}} total",
@@ -65,7 +65,7 @@
       "actions": "Actions"
     },
     "statusSuccess": "SUCCESS",
-    "statusProcessing": "Processing...",
+    "statusProcessing": "DB Parsing...",
     "statusJustNow": "Just now",
     "targetSpot": "spot_temperature_sensor",
     "targetPlc": "System PLC",
