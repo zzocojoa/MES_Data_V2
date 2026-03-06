@@ -185,10 +185,15 @@ def process_file_upload(file: UploadFile, background_tasks: BackgroundTasks = No
     with open(file_location, "wb+") as file_object:
         file_object.write(file.file.read())
         
-    if background_tasks:
-        background_tasks.add_task(run_pipeline_for_file, file_location)
+    # [Fix for #RaceCondition]
+    # We DO NOT execute the pipeline subprocess here anymore.
+    # The external docker container `mes_watcher` (watcher.py) constantly polls the `data_in` directory.
+    # If we run it here, both the API container and the Watcher container try to process and delete the same file.
+    # if background_tasks:
+    #     abs_file_location = os.path.abspath(file_location)
+    #     background_tasks.add_task(run_pipeline_for_file, abs_file_location)
         
-    return {"status": "success", "info": f"file '{file.filename}' saved and processing started"}
+    return {"status": "success", "info": f"file '{file.filename}' saved and processing handed over to watcher daemon"}
 
 def delete_uploaded_file_data(filename: str, db: Session):
     from sqlalchemy import text
