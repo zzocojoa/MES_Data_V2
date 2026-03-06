@@ -61,7 +61,8 @@ def process_file(processor, file_path):
         
         # 성공 시 원본 CSV 영구 삭제 (DB-Only 보관 정책)
         dest_log_path = os.path.join(PROCESSED_DIR, f"{filename}.log")
-        os.remove(file_path)
+        if os.path.exists(file_path):
+            os.remove(file_path)
         
         # 처리 로그 저장
         with open(dest_log_path, "w", encoding="utf-8") as f:
@@ -74,9 +75,15 @@ def process_file(processor, file_path):
         log_messages.append(f"[{datetime.now().isoformat()}] ERROR: Exception occurred during parsing or DB insertion:")
         log_messages.append(error_trace)
         
-        # 실패 시 에러 폴더로 이동
+        # 실패 시 에러 폴더로 복사 후 원본 삭제 (cross-device link 에러 방지)
         dest_path = os.path.join(ERROR_DIR, filename)
-        shutil.move(file_path, dest_path)
+        if os.path.exists(file_path):
+            try:
+                shutil.copy2(file_path, dest_path)
+                os.remove(file_path)
+            except Exception as move_err:
+                print(f"Failed to copy/remove file to error directory: {move_err}")
+                log_messages.append(f"[{datetime.now().isoformat()}] ERROR: Failed to move file: {move_err}")
         
         # 에러 로그 저장
         with open(dest_path + ".log", "w", encoding="utf-8") as f:
