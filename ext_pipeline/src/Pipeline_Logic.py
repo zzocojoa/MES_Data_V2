@@ -30,10 +30,13 @@ class CsvProcessor:
         print(f"Processing PLC CSV: {csv_path}")
         
         try:
-            # Read CSV in chunks to prevent memory spikes on 2GB NAS
-            chunk_iter = pd.read_csv(csv_path, encoding="utf-8", chunksize=10000)
+            pd.read_csv(csv_path, encoding="utf-8", nrows=1)
+            encoding = "utf-8"
         except UnicodeDecodeError:
-            chunk_iter = pd.read_csv(csv_path, encoding="cp949", chunksize=10000)
+            encoding = "cp949"
+            
+        # Read CSV in chunks to prevent memory spikes on 2GB NAS
+        chunk_iter = pd.read_csv(csv_path, encoding=encoding, chunksize=10000)
             
         for df in chunk_iter:
             if df.empty:
@@ -67,9 +70,12 @@ class CsvProcessor:
         print(f"Processing SPOT Check CSV: {csv_path}")
         
         try:
-            chunk_iter = pd.read_csv(csv_path, encoding="utf-8", chunksize=10000)
+            pd.read_csv(csv_path, encoding="utf-8", nrows=1)
+            encoding = "utf-8"
         except UnicodeDecodeError:
-            chunk_iter = pd.read_csv(csv_path, encoding="cp949", chunksize=10000)
+            encoding = "cp949"
+            
+        chunk_iter = pd.read_csv(csv_path, encoding=encoding, chunksize=10000)
 
         for df in chunk_iter:
             if df.empty: continue
