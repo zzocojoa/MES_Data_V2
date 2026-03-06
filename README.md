@@ -85,3 +85,9 @@ sudo docker-compose restart
 # 33. 서버 다시 켜기 (종료 후 실행)
 
 sudo docker-compose up -d
+
+## NAS docker 접속
+
+ssh admin@192.168.0.235
+
+cd volume1/스마트팩토리/docker/MES_Data_V2

@@ -17,7 +17,6 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
           memory: 300M
 
   api:
@@ -47,7 +46,6 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
           memory: 256M
 
   watcher:
@@ -76,7 +74,6 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
           memory: 350M
 
   web:
@@ -92,7 +89,6 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.2'
           memory: 128M
 
 volumes:
